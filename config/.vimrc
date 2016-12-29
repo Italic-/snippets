@@ -27,6 +27,7 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-commentary'
+Plugin 'Raimondi/delimitMate'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -47,8 +48,9 @@ nnoremap <C-H> <C-W><C-H>
 set foldlevel=99
 nnoremap <space> za
 
+highlight BadWhitespace ctermbg=darkgrey guibg=darkred
 autocmd BufNewFile,FileType *.py,*.pyw setlocal commentstring=#\ %s
-au BufNewFile,BufRead *.py
+au BufNewFile,BufRead *.py,*.pyw
     \ set tabstop=4 |
     \ set softtabstop=4 |
     \ set shiftwidth=4 |
@@ -57,12 +59,11 @@ au BufNewFile,BufRead *.py
     \ set autoindent |
     \ set fileformat=unix |
     \ set autoread |
-    \ set nowrap
+    \ set nowrap |
+    \ match BadWhitespace /\s\+$/ |
 
 
-" Trailing whitespace highlighting
-highlight BadWhitespace ctermbg=darkgrey guibg=darkred
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h
+au BufRead,BufNewFile *.c,*.h
     \ match BadWhitespace /\s\+$/
 
 set encoding=utf-8
