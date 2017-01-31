@@ -1,4 +1,4 @@
 source ~/.vimrc
-colorscheme solarized
+colorscheme two-firewatch
 syntax on
 set background=dark
