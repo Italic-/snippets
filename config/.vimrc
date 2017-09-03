@@ -17,16 +17,19 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
-" Languages and general plugins
+" General plugins
 Plugin 'rakr/vim-two-firewatch'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'vim-airline/vim-airline'
-" Plugin 'vim-syntastic/syntastic'
 Plugin 'mattn/webapi-vim'
-Plugin 'rust-lang/rust.vim'
-Plugin 'klen/python-mode'
 Plugin 'tmhedberg/SimpylFold'
 Plugin 'fholgado/minibufexpl.vim'
+" Plugin 'vim-syntastic/syntastic'
+" Languages
+Plugin 'klen/python-mode'
+Plugin 'rust-lang/rust.vim'
+Plugin 'willzhou/oslvim'
+Plugin 'racer-rust/vim-racer'
 " Searchers
 Plugin 'Shougo/vimproc.vim'  " Run make from vimproc dir after install
 Plugin 'Shougo/unite.vim'
@@ -41,15 +44,19 @@ Plugin 'tomtom/tlib_vim'
 Plugin 'garbas/vim-snipmate'
 Plugin 'honza/vim-snippets'
 " Git
-Plugin 'airblade/vim-gitgutter'
+if !has('nvim')
+	Plugin 'airblade/vim-gitgutter'
+endif
 Plugin 'tpope/vim-fugitive'
 " Connect to Maya/Blender
 Plugin 'vim-scripts/Vimya'
-Plugin 'mipmip/vim-run-in-blender'
+if !has('nvim')
+	Plugin 'mipmip/vim-run-in-blender'
+endif
 
 " All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
+call vundle#end()			" required
+filetype plugin indent on	" required
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -65,8 +72,15 @@ augroup END
 
 let g:two_firewatch_italics=1
 let g:airline_theme='twofirewatch'
+" let g:airline#extensions#tabline#enabled=1
+" let g:airline#extensions#tabline#left_sep=">"
+" let g:airline#extensions#tabline#left_alt_sep="|"
 hi Folded ctermbg=236 ctermfg=243
-hi BadWhitespace ctermbg=darkgrey guibg=darkred
+hi BadWhitespace ctermbg=darkred guibg=darkred
+set cursorline
+set cursorcolumn
+hi CursorLine cterm=None ctermbg=237
+hi CursorColumn cterm=None ctermbg=237
 
 set encoding=utf-8
 set nu
@@ -81,6 +95,16 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 nnoremap <Leader>s :set scb!<CR>  " toggle scrollbind (scroll two windows syncronously)
+
+" Save current buffer if modified and restore selection if possible
+nmap <F8> :update<CR>
+vmap <F8> <Esc><F8>gv
+imap <F8> <c-o><F8>
+
+" Force reload current file from disk and restore selection if possible
+nmap <F5> :e!<CR>
+vmap <F5> <Esc><F5>gv
+imap <F5> <c-o><F5>
 
 " Folding
 set foldlevel=99
@@ -106,6 +130,9 @@ nnoremap <Tab>R <Plug>(unite_restart)
 nmap + :Ag <C-R>=expand("<cword>")<CR><CR>
 nnoremap <Tab><Space> :Ag 
 
+" Send to new line
+nnoremap <C-S-O> i<Enter><Esc>l
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -118,10 +145,12 @@ hi MBEVisibleChanged		ctermfg=204 " ctermbg=fg guifg=204 guibg=fg
 hi MBEVisibleActiveNormal	ctermfg=112 " ctermbg=fg guifg=112 guibg=fg
 hi MBEVisibleActiveChanged	ctermfg=204 " ctermbg=fg guifg=204 guibg=fg
 
+let g:miniBufExplorerAutoStart = 1
+let g:miniBufExplBuffersNeeded = 1
 let g:miniBufExplBRSplit = 0
 let g:did_minibufexplorer_syntax_inits = 1
-noremap <C-Tab>			:MBEbn<CR>
-noremap <C-S-Tab> 		:MBEbp<CR>
+" noremap <C-Tab> :MBEbn<CR>
+" noremap <C-S-Tab> :MBEbp<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -141,17 +170,19 @@ au BufNewFile,BufRead *.py,*.pyw
 	\ set fileformat=unix |
 	\ set autoread |
 	\ set nowrap |
+	\ let g:pymode_python = 'python3' |
+	\ let g:pymode_syntax_print_as_function=1 |
 	\ let g:pymode_syntax=1 |
 	\ let g:pymode_syntax_all=1 |
-	\ let g:pymode_syntax_indent_errors=g:pymode_syntax_all |
-	\ let g:pymode_syntax_space_errors=g:pymode_syntax_all |
 	\ let g:pymode_lint_sort = ['E', 'C', 'I'] |
 	\ let g:pymode_lint_ignore = "E501" |
-	\ let g:pymode_lint_checkers = ['pyflakes', 'pep8', 'mccabe', 'pep257'] |
+	\ let g:pymode_lint_checkers = ['pyflakes', 'pycodestyle', 'mccabe', 'pep257'] |
 	\ let g:pymode_lint_unmodified=1 |
+	\ let g:pymode_rope_lookup_project=0 |
 	\ match BadWhitespace /\s\+$/ |
-	\ nnoremap <Leader>p :PymodeLintAuto<cr> |
-	\ nnoremap <Leader>l :PymodeLint<cr> |
+	\ nnoremap <Leader>p :PymodeLintAuto<CR> |
+	\ nnoremap <Leader>l :PymodeLint<CR> |
+	\ nnoremap <F4> :%s`\v\s+$``ge<CR> |
 	\ set completeopt=menu |
 	" \ let g:pymode_folding=1 |
 	" \ set foldmethod=indent |
@@ -167,7 +198,25 @@ autocmd BufWinLeave *.py,*.pyw
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-let g:rustfmt_autosave=1
+autocmd BufNewFile,FileType,BufWinEnter *.rs setlocal commentstring=//\ %s
+au BufNewFile,BufRead,BufWinEnter *.rs
+	\ let maplocalleader='\' |
+	\ set tabstop=4 |
+	\ set softtabstop=4 |
+	\ set shiftwidth=4 |
+	\ set expandtab |
+	\ set autoindent |
+	\ set fileformat=unix |
+	\ set autoread |
+	\ set nowrap |
+	\ set hidden |
+	\ match BadWhitespace /\s\+$/ |
+	\ let g:rustfmt_autosave=1 |
+	\ let g:rust_fold=1 |
+	\ let g:racer_cmd="racer" |
+	\ nnoremap <Leader>l :RustFmt<CR> |
+	\ nnoremap <F4> :%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<CR> |
+	\ set completeopt=menu |
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -177,6 +226,9 @@ let g:rustfmt_autosave=1
 
 au BufRead,BufNewFile *.c,*.h
 	\ match BadWhitespace /\s\+$/
+
+autocmd BufRead,BufNew,BufNewFile,BufCreate *.osl
+	\ set filetype=osl
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
