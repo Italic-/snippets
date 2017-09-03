@@ -182,7 +182,7 @@ au BufNewFile,BufRead *.py,*.pyw
 	\ match BadWhitespace /\s\+$/ |
 	\ nnoremap <Leader>p :PymodeLintAuto<CR> |
 	\ nnoremap <Leader>l :PymodeLint<CR> |
-	\ nnoremap <F4> :%s`\v\s+$``ge<CR> |
+	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v\s+$``ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
 	" \ let g:pymode_folding=1 |
 	" \ set foldmethod=indent |
@@ -215,7 +215,7 @@ au BufNewFile,BufRead,BufWinEnter *.rs
 	\ let g:rust_fold=1 |
 	\ let g:racer_cmd="racer" |
 	\ nnoremap <Leader>l :RustFmt<CR> |
-	\ nnoremap <F4> :%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<CR> |
+	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
 
 
