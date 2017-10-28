@@ -24,7 +24,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'mattn/webapi-vim'
 Plugin 'tmhedberg/SimpylFold'
 Plugin 'fholgado/minibufexpl.vim'
-" Plugin 'vim-syntastic/syntastic'
+Plugin 'vim-syntastic/syntastic'
 " Languages
 Plugin 'klen/python-mode'
 Plugin 'rust-lang/rust.vim'
@@ -99,12 +99,12 @@ nnoremap <Leader>s :set scb!<CR>  " toggle scrollbind (scroll two windows syncro
 " Save current buffer if modified and restore selection if possible
 nmap <F8> :update<CR>
 vmap <F8> <Esc><F8>gv
-imap <F8> <c-o><F8>
+imap <F8> <C-O><F8>
 
 " Force reload current file from disk and restore selection if possible
 nmap <F5> :e!<CR>
 vmap <F5> <Esc><F5>gv
-imap <F5> <c-o><F5>
+imap <F5> <C-O><F5>
 
 " Folding
 set foldlevel=99
@@ -201,6 +201,7 @@ autocmd BufWinLeave *.py,*.pyw
 autocmd BufNewFile,FileType,BufWinEnter *.rs setlocal commentstring=//\ %s
 au BufNewFile,BufRead,BufWinEnter *.rs
 	\ let maplocalleader='\' |
+	\ set filetype=rust |
 	\ set tabstop=4 |
 	\ set softtabstop=4 |
 	\ set shiftwidth=4 |
@@ -214,6 +215,10 @@ au BufNewFile,BufRead,BufWinEnter *.rs
 	\ let g:rustfmt_autosave=1 |
 	\ let g:rust_fold=1 |
 	\ let g:racer_cmd="racer" |
+	\ nmap gd <Plug>(rust-def) |
+	\ nmap gs <Plug>(rust-def-split) |
+	\ nmap gx <Plug>(rust-def-vertical) |
+	\ nmap <leader>gd <Plug>(rust-doc) |
 	\ nnoremap <Leader>l :RustFmt<CR> |
 	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
@@ -230,6 +235,10 @@ au BufRead,BufNewFile *.c,*.h
 autocmd BufRead,BufNew,BufNewFile,BufCreate *.osl
 	\ set filetype=osl
 
+let g:syntastic_check_on_wq=0
+let g:syntastic_check_on_open=1
+let g:syntastic_rust_checkers=["rustc"]
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COMMENTS
@@ -243,4 +252,6 @@ autocmd BufRead,BufNew,BufNewFile,BufCreate *.osl
 " :set scb! " toggle scrollbind (scroll two windows syncronously)
 
 " enabling causes files to be entered in delete mode(?). Line movement causes deletion.
-" nnoremap <silent> <esc> :noh<cr><esc>
+" nnoremap <silent> <esc> :noh<CR><ESC>
+
+" pymode refactoring: <C-C>rr (and others; see pymode docs)
