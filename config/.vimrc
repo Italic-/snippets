@@ -20,49 +20,56 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 " General plugins
-Plugin 'rakr/vim-two-firewatch'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'vim-airline/vim-airline'
-Plugin 'mattn/webapi-vim'
-Plugin 'fholgado/minibufexpl.vim'
-Plugin 'vim-syntastic/syntastic'
-Plugin 'tpope/vim-abolish'
-Plugin 'idanarye/vim-vebugger'
-Plugin 'bernh/pss.vim'
+Plugin 'rakr/vim-two-firewatch'           " Color scheme inspired by Firewatch
+Plugin 'altercation/vim-colors-solarized' " Solarized color scheme
+Plugin 'vim-airline/vim-airline'          " Status line
+Plugin 'mattn/webapi-vim'                 " Interface to web APIs (required for other plugins)
+Plugin 'fholgado/minibufexpl.vim'         " Compact buffer list for quick navigation
+Plugin 'vim-syntastic/syntastic'          " Generic syntax framework
+Plugin 'tpope/vim-abolish'                " Abbreviation, substitution, case style coercion
+Plugin 'idanarye/vim-vebugger'            " Interface with various debuggers (gdb, pdb, rdebug, ...)
+Plugin 'bernh/pss.vim'                    " Source code searcher
+
 " Languages
-Plugin 'python-mode/python-mode'
-Plugin 'willzhou/oslvim'
+Plugin 'python-mode/python-mode'          " Autocomplete, folding, execution, etc.
+Plugin 'willzhou/oslvim'                  " Language + syntax
+
 " Rust
-Plugin 'rust-lang/rust.vim'
-Plugin 'timonv/vim-cargo'
-Plugin 'racer-rust/vim-racer'
+Plugin 'rust-lang/rust.vim'               " Language + syntax
+Plugin 'timonv/vim-cargo'                 " Wrapper for cargo commands
+Plugin 'racer-rust/vim-racer'             " Rust autocomplete
+
 " Searchers
-Plugin 'Shougo/vimproc.vim'	" Run make from vimproc dir after install
-Plugin 'Shougo/unite.vim'
-Plugin 'rking/ag.vim'		" yum install the_silver_searcher
+Plugin 'Shougo/vimproc.vim'               " Run make from vimproc dir after install
+if !has('nvim')
+	Plugin 'Shougo/unite.vim'         " Original fuzzy finder
+else
+	Plugin 'Shougo/denite.nvim'       " Improved unite for neovim
+endif
+Plugin 'rking/ag.vim'                     " yum install the_silver_searcher
+
 " Comment/bracket helpers
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-commentary'
-Plugin 'Raimondi/delimitMate'
+Plugin 'tpope/vim-surround'               " Add/change/remove surrounding blocks like: '', \"\", <p></p>
+Plugin 'tpope/vim-commentary'             " Comment lines and blocks
+Plugin 'Raimondi/delimitMate'             " Automatic pairing of delimiters like (), {}, \"\", '', <>, []
+
 " Snipmate
-Plugin 'MarcWeber/vim-addon-mw-utils'
-Plugin 'tomtom/tlib_vim'
-Plugin 'garbas/vim-snipmate'
-Plugin 'honza/vim-snippets'
+Plugin 'MarcWeber/vim-addon-mw-utils'     " Utils for other plugins
+Plugin 'tomtom/tlib_vim'                  " Utils for other plugins
+Plugin 'garbas/vim-snipmate'              " Autocomplete template shortcuts
+Plugin 'honza/vim-snippets'               " Presets for SnipMate
+
 " Git
-if !has('nvim')
-	Plugin 'airblade/vim-gitgutter'
-endif
-Plugin 'tpope/vim-fugitive'
+Plugin 'airblade/vim-gitgutter'           " Git diff visualization
+Plugin 'tpope/vim-fugitive'               " Git commands from vim
+
 " Connect to Maya/Blender
-Plugin 'vim-scripts/Vimya'
-if !has('nvim')
-	Plugin 'mipmip/vim-run-in-blender'
-endif
+Plugin 'vim-scripts/Vimya'                " Send python script to maya
+Plugin 'mipmip/vim-run-in-blender'        " Send python script to blender
 
 " All of your Plugins must be added before the following line
-call vundle#end()		" required
-filetype plugin indent on	" required
+call vundle#end()
+filetype plugin indent on
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -180,7 +187,7 @@ autocmd BufNewFile,BufRead,FileType *.py,*.pyw
 	\ let g:pymode_syntax=1 |
 	\ let g:pymode_syntax_all=1 |
 	\ let g:pymode_lint_sort = ['E', 'C', 'I'] |
-	\ let g:pymode_lint_ignore = ["E501", "W401"] |
+	\ let g:pymode_lint_ignore = ["E501", "W401", "D203"] |
 	\ let g:pymode_lint_checkers = ['pyflakes', 'pycodestyle', 'mccabe', 'pep257'] |
 	\ let g:pymode_lint_unmodified=1 |
 	\ let g:pymode_rope_lookup_project=0 |
@@ -227,7 +234,7 @@ autocmd BufNewFile,BufRead,BufWinEnter,FileType *.rs
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" MAYA
+" MAYA / BLENDER
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let g:vimyaHost="localhost"
@@ -236,6 +243,8 @@ let g:vimyaDefaultFiletype="python"
 autocmd BufNewFile,BufRead,FileType *.py,*.pyw
 	\ nnoremap <Leader>m :vimyaRun<CR> |
 	\ vnoremap <Leader>m :vimyaRun<CR> |
+	\ nnoremap <Leader>bpy :RunInBlender<CR> |
+	\ vnoremap <Leader>bpy :'<,'>RunSelectionInBlender<CR> |
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
