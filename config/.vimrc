@@ -14,6 +14,8 @@ call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
@@ -22,18 +24,22 @@ Plugin 'rakr/vim-two-firewatch'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'vim-airline/vim-airline'
 Plugin 'mattn/webapi-vim'
-Plugin 'tmhedberg/SimpylFold'
 Plugin 'fholgado/minibufexpl.vim'
 Plugin 'vim-syntastic/syntastic'
+Plugin 'tpope/vim-abolish'
+Plugin 'idanarye/vim-vebugger'
+Plugin 'bernh/pss.vim'
 " Languages
-Plugin 'klen/python-mode'
-Plugin 'rust-lang/rust.vim'
+Plugin 'python-mode/python-mode'
 Plugin 'willzhou/oslvim'
+" Rust
+Plugin 'rust-lang/rust.vim'
+Plugin 'timonv/vim-cargo'
 Plugin 'racer-rust/vim-racer'
 " Searchers
-Plugin 'Shougo/vimproc.vim'  " Run make from vimproc dir after install
+Plugin 'Shougo/vimproc.vim'	" Run make from vimproc dir after install
 Plugin 'Shougo/unite.vim'
-Plugin 'rking/ag.vim' " yum install the_silver_searcher
+Plugin 'rking/ag.vim'		" yum install the_silver_searcher
 " Comment/bracket helpers
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-commentary'
@@ -55,7 +61,7 @@ if !has('nvim')
 endif
 
 " All of your Plugins must be added before the following line
-call vundle#end()			" required
+call vundle#end()		" required
 filetype plugin indent on	" required
 
 
@@ -70,11 +76,9 @@ augroup myvimrchooks
 	autocmd bufwritepost .vimrc source ~/.vimrc
 augroup END
 
+set background=dark
 let g:two_firewatch_italics=1
 let g:airline_theme='twofirewatch'
-" let g:airline#extensions#tabline#enabled=1
-" let g:airline#extensions#tabline#left_sep=">"
-" let g:airline#extensions#tabline#left_alt_sep="|"
 hi Folded ctermbg=236 ctermfg=243
 hi BadWhitespace ctermbg=darkred guibg=darkred
 set cursorline
@@ -108,11 +112,8 @@ imap <F5> <C-O><F5>
 
 " Folding
 set foldlevel=99
+set foldmethod=syntax
 nnoremap <Space> za
-
-let g:SimpylFold_docstring_preview = 1
-let g:SimpylFold_fold_docstring = 1
-let g:SimpylFold_fold_import = 0
 
 " Unite
 let g:unite_source_history_yank_enable = 1
@@ -132,6 +133,10 @@ nnoremap <Tab><Space> :Ag
 
 " Send to new line
 nnoremap <C-S-O> i<Enter><Esc>l
+
+" Debug
+let g:vebugger_leader='<Leader>v'
+nnoremap <Leader>vk :VBGkill<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -158,8 +163,8 @@ let g:did_minibufexplorer_syntax_inits = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-autocmd BufNewFile,FileType *.py,*.pyw setlocal commentstring=#\ %s
-au BufNewFile,BufRead *.py,*.pyw
+autocmd BufNewFile,BufRead,FileType *.py,*.pyw
+	\ setlocal commentstring=#\ %s |
 	\ let maplocalleader='\' |
 	\ set tabstop=4 |
 	\ set softtabstop=4 |
@@ -175,22 +180,18 @@ au BufNewFile,BufRead *.py,*.pyw
 	\ let g:pymode_syntax=1 |
 	\ let g:pymode_syntax_all=1 |
 	\ let g:pymode_lint_sort = ['E', 'C', 'I'] |
-	\ let g:pymode_lint_ignore = "E501" |
+	\ let g:pymode_lint_ignore = ["E501", "W401"] |
 	\ let g:pymode_lint_checkers = ['pyflakes', 'pycodestyle', 'mccabe', 'pep257'] |
 	\ let g:pymode_lint_unmodified=1 |
 	\ let g:pymode_rope_lookup_project=0 |
 	\ match BadWhitespace /\s\+$/ |
+	\ nmap <Leader>vd :VBGstartPDB <C-R>%<CR> |
 	\ nnoremap <Leader>p :PymodeLintAuto<CR> |
 	\ nnoremap <Leader>l :PymodeLint<CR> |
 	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v\s+$``ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
-	" \ let g:pymode_folding=1 |
+	\ let g:pymode_folding=1 |
 	" \ set foldmethod=indent |
-
-autocmd BufWinEnter *.py,*.pyw
-	\ setlocal foldexpr=SimpylFold(v:lnum) foldmethod=expr
-autocmd BufWinLeave *.py,*.pyw
-	\ setlocal foldexpr< foldmethod<
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -198,8 +199,8 @@ autocmd BufWinLeave *.py,*.pyw
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-autocmd BufNewFile,FileType,BufWinEnter *.rs setlocal commentstring=//\ %s
-au BufNewFile,BufRead,BufWinEnter *.rs
+autocmd BufNewFile,BufRead,BufWinEnter,FileType *.rs
+	\ setlocal commentstring=//\ %s |
 	\ let maplocalleader='\' |
 	\ set filetype=rust |
 	\ set tabstop=4 |
@@ -215,6 +216,7 @@ au BufNewFile,BufRead,BufWinEnter *.rs
 	\ let g:rustfmt_autosave=1 |
 	\ let g:rust_fold=1 |
 	\ let g:racer_cmd="racer" |
+	\ let g:cargo_command=":! cargo {cmd}" |
 	\ nmap gd <Plug>(rust-def) |
 	\ nmap gs <Plug>(rust-def-split) |
 	\ nmap gx <Plug>(rust-def-vertical) |
@@ -222,6 +224,18 @@ au BufNewFile,BufRead,BufWinEnter *.rs
 	\ nnoremap <Leader>l :RustFmt<CR> |
 	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" MAYA
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:vimyaHost="localhost"
+let g:vimyaPort=7720
+let g:vimyaDefaultFiletype="python"
+autocmd BufNewFile,BufRead,FileType *.py,*.pyw
+	\ nnoremap <Leader>m :vimyaRun<CR> |
+	\ vnoremap <Leader>m :vimyaRun<CR> |
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
