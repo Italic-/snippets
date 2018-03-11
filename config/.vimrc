@@ -23,12 +23,15 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'rakr/vim-two-firewatch'           " Color scheme inspired by Firewatch
 Plugin 'altercation/vim-colors-solarized' " Solarized color scheme
 Plugin 'vim-airline/vim-airline'          " Status line
-Plugin 'mattn/webapi-vim'                 " Interface to web APIs (required for other plugins)
 Plugin 'fholgado/minibufexpl.vim'         " Compact buffer list for quick navigation
-Plugin 'vim-syntastic/syntastic'          " Generic syntax framework
+Plugin 'vim-syntastic/syntastic'          " Generic syntax highlighting framework
 Plugin 'tpope/vim-abolish'                " Abbreviation, substitution, case style coercion
 Plugin 'idanarye/vim-vebugger'            " Interface with various debuggers (gdb, pdb, rdebug, ...)
 Plugin 'bernh/pss.vim'                    " Source code searcher
+
+" Utils
+Plugin 'kopischke/vim-fetch'              " Let vim understand line/column numbers
+Plugin 'mattn/webapi-vim'                 " Interface to web APIs (required for other plugins)
 
 " Languages
 Plugin 'python-mode/python-mode'          " Autocomplete, folding, execution, etc.
@@ -41,11 +44,8 @@ Plugin 'racer-rust/vim-racer'             " Rust autocomplete
 
 " Searchers
 Plugin 'Shougo/vimproc.vim'               " Run make from vimproc dir after install
-if !has('nvim')
-	Plugin 'Shougo/unite.vim'         " Original fuzzy finder
-else
-	Plugin 'Shougo/denite.nvim'       " Improved unite for neovim
-endif
+Plugin 'junegunn/fzf'                     " Fuzzy finder (pair with ripgrep and bsf)
+Plugin 'junegunn/fzf.vim'                 " Fuzzy finder vim plugin
 Plugin 'rking/ag.vim'                     " yum install the_silver_searcher
 
 " Comment/bracket helpers
@@ -53,10 +53,9 @@ Plugin 'tpope/vim-surround'               " Add/change/remove surrounding blocks
 Plugin 'tpope/vim-commentary'             " Comment lines and blocks
 Plugin 'Raimondi/delimitMate'             " Automatic pairing of delimiters like (), {}, \"\", '', <>, []
 
-" Snipmate
-Plugin 'MarcWeber/vim-addon-mw-utils'     " Utils for other plugins
-Plugin 'tomtom/tlib_vim'                  " Utils for other plugins
-Plugin 'garbas/vim-snipmate'              " Autocomplete template shortcuts
+" Autocomplete & Snippets
+Plugin 'valloric/YouCompleteMe'           " Daemon-based autocomplete engine (must be compiled before use - see https://valloric.github.io/YouCompleteMe/
+Plugin 'SirVer/ultisnips'                 " Autocomplete templates (snippets)
 Plugin 'honza/vim-snippets'               " Presets for SnipMate
 
 " Git
@@ -77,27 +76,33 @@ filetype plugin indent on
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+set undofile
+set undodir=~/.vim/undodir
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip
+set encoding=utf-8
+set nu             " Show line numbers
+set splitright     " Vertical splits send new window to right
+set splitbelow     " Horizontal splits send new window to bottom
+set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅
+
 let g:mapleader='\'
+
 augroup myvimrchooks
 	au!
 	autocmd bufwritepost .vimrc source ~/.vimrc
 augroup END
 
+" Colors
 set background=dark
 let g:two_firewatch_italics=1
 let g:airline_theme='twofirewatch'
 hi Folded ctermbg=236 ctermfg=243
 hi BadWhitespace ctermbg=darkred guibg=darkred
+" Line/column highlighting
 set cursorline
 set cursorcolumn
 hi CursorLine cterm=None ctermbg=237
 hi CursorColumn cterm=None ctermbg=237
-
-set encoding=utf-8
-set nu
-set splitright
-set splitbelow
-set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅
 
 " split navigations
 nnoremap <C-J> <C-W><C-J>
@@ -107,7 +112,7 @@ nnoremap <C-H> <C-W><C-H>
 
 nnoremap <Leader>s :set scb!<CR>  " toggle scrollbind (scroll two windows syncronously)
 
-" Save current buffer if modified and restore selection if possible
+" Save current buffer and restore selection if possible
 nmap <F8> :update<CR>
 vmap <F8> <Esc><F8>gv
 imap <F8> <C-O><F8>
@@ -122,28 +127,47 @@ set foldlevel=99
 set foldmethod=syntax
 nnoremap <Space> za
 
-" Unite
-let g:unite_source_history_yank_enable = 1
-try
-	let g:unite_source_rec_async_command = 'ag --nocolor --nogroup'
-	call unite#filters#matcher_default#use(['matcher_fuzzy'])
-catch
-endtry
-" Search in the file tree
-nnoremap <Tab> :split<CR> :<C-U>Unite -start-insert file_rec/async<CR>
-" Reset Unite
-nnoremap <Tab>R <Plug>(unite_restart)
-
-" AG - The Silver Searcher
-nmap + :Ag <C-R>=expand("<cword>")<CR><CR>
-nnoremap <Tab><Space> :Ag 
-
 " Send to new line
 nnoremap <C-S-O> i<Enter><Esc>l
 
 " Debug
-let g:vebugger_leader='<Leader>v'
+let g:vebugger_leader='<Leader>V'
 nnoremap <Leader>vk :VBGkill<CR>
+
+" Autocomplete, Ultisnips
+let g:UltiSnipsExpandTrigger="<C-J>"
+let g:UltiSnipsJumpForwardTrigger="<C-J>"
+let g:UltiSnipsJumpBackwardTrigger="<C-K>"
+nnoremap <Leader>] :YcmCompleter GoTo<CR>
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fuzzy finders (fzf, ripgrep, bsf)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+set grepprg=rg\ --vimgrep
+
+nmap <C-P> :Files<CR>
+imap <C-X><C-L> <plug>(fzf-complete-line)
+
+let g:fzf_action = {
+	\ 'ctrl-t': 'tab split',
+	\ 'ctrl-i': 'split',
+	\ 'ctrl-s': 'vsplit'}
+let g:fzf_layout = {'down': '~30%'}
+
+let g:rg_command = '
+	\ rg  --ignore-case --no-ignore --hidden --pretty
+	\ --glob "$FZF_INCLUDE"
+	\ --glob "$FZF_EXCLUDE_DIRS"
+	\ --glob "$FZF_EXCLUDE_FILES"'
+
+command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
+
+" AG - The Silver Searcher
+nmap + :Ag <C-R>=expand("<cword>")<CR><CR>
+nnoremap <Tab><Space> :Ag 
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -169,6 +193,9 @@ let g:did_minibufexplorer_syntax_inits = 1
 " PYTHON SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+
+let g:pymode_rope_completion=0
+let g:pymode_rope_complete_on_dot=0
 
 autocmd BufNewFile,BufRead,FileType *.py,*.pyw
 	\ setlocal commentstring=#\ %s |
@@ -227,11 +254,12 @@ autocmd BufNewFile,BufRead,BufWinEnter,FileType *.rs
 	\ nmap gd <Plug>(rust-def) |
 	\ nmap gs <Plug>(rust-def-split) |
 	\ nmap gx <Plug>(rust-def-vertical) |
-	\ nmap <leader>gd <Plug>(rust-doc) |
+	\ nmap <Leader>gd <Plug>(rust-doc) |
 	\ nnoremap <Leader>l :RustFmt<CR> |
 	\ nnoremap <F4> :let _s=@/<Bar>:%s`\v^(\s*//[^/!]{-}\|\s*[^/]{-}\|\n)(\s+)$`\1`ge<Bar>:let @/=_s<Bar><CR> |
 	\ set completeopt=menu |
 
+let g:syntastic_rust_checkers=["rustc"]
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MAYA / BLENDER
@@ -260,7 +288,6 @@ autocmd BufRead,BufNew,BufNewFile,BufCreate *.osl
 
 let g:syntastic_check_on_wq=0
 let g:syntastic_check_on_open=1
-let g:syntastic_rust_checkers=["rustc"]
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -272,7 +299,6 @@ let g:syntastic_rust_checkers=["rustc"]
 " zt scroll so cursor is on top
 " zz scroll so cursor is in middle
 " zb scroll so cursor is on bottom
-" :set scb! " toggle scrollbind (scroll two windows syncronously)
 
 " enabling causes files to be entered in delete mode(?). Line movement causes deletion.
 " nnoremap <silent> <esc> :noh<CR><ESC>
