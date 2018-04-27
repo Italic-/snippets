@@ -13,9 +13,10 @@ alias la="ls -lah --color --group-directories-first"
 alias dd="dd status=progress bs=4M"
 alias grep="grep -i"
 alias vim="nvim"
-alias where="bfs ./ -name "
+alias where="bfs -L ./ -name "
 alias rg="rg -p"
 alias log="fzf_log"
+alias find="bfs -L"
 
 export EDITOR=vim
 export TERM=xterm-256color
@@ -23,6 +24,10 @@ export TERM=xterm-256color
 # Fuzzy finder and ripgrep for fast file searching (bfs for directory search)
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+
+whoseport() {
+	lsof -i ":$1" | grep LISTEN
+}
 
 notes() {
 	if [ -z "$1" ]; then
