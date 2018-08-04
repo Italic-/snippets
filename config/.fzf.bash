@@ -28,10 +28,11 @@ bind "$(bind -s | grep '^"\\C-r"' | sed 's/"/"\\C-x/' | sed 's/"$/\\C-m"/')"
 read -d '' rg_command <<EOF
 rg --column --line-number --no-heading --fixed-strings \
 --ignore-case --no-ignore --hidden --color \"always\" \
---glob \"${FZF_INCLUDE}\" \
+--glob \"*\" \
 --glob \"${FZF_EXCLUDE_DIRS}\" \
 --glob \"${FZF_EXCLUDE_FILES}\"
 EOF
+# --glob \"${FZF_INCLUDE}\" \
 
 sf() {
 	if [ "$#" -lt 1 ]; then echo "Supply string to search for"; return 1; fi
