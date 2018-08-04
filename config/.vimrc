@@ -139,6 +139,10 @@ nnoremap zM :%foldc<CR>
 " Send to new line
 nnoremap <C-S-O> i<Enter><Esc>l
 
+" Copy/paste with system clipboard
+vnoremap <Leader>c "+y
+" vnoremap <Leader>v "+p
+
 " Debug
 let g:vebugger_leader = '<Leader>V'
 nnoremap <Leader>vk :VBGkill<CR>
