@@ -9,7 +9,7 @@ fi
 # User specific environment and startup programs ===================================================
 
 
-PATH=$HOME/.local/bin:$HOME/bin:$HOME/opt/neovim/bin:$HOME/node_modules/.bin:$PATH
+PATH=$HOME/.local/bin:$HOME/bin:$HOME/opt/neovim/bin:$HOME/opt/firefox/bin:$HOME/node_modules/.bin:$PATH
 C_INCLUDE_PATH=$HOME/include:$C_INCLUDE_PATH
 CPLUS_INCLUDE_PATH=$HOME/include:$CPLUS_INCLUDE_PATH
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:/usr/lib:/usr/lib64:$LD_LIBRARY_PATH
@@ -41,7 +41,6 @@ PATH=$CUDA_PATH/bin:$HOME/blender:$PATH
 C_INCLUDE_PATH=$CUDA_PATH/include:/opt/lib/openvdb/include:$B3D_PY_PATH/include:$C_INCLUDE_PATH
 CPLUS_INCLUDE_PATH=$CUDA_PATH/include:/opt/lib/openvdb/include:$B3D_PY_PATH/include:$CPLUS_INCLUDE_PATH
 LD_LIBRARY_PATH=$CUDA_PATH/lib64:$B3D_PY_PATH/lib:$LD_LIBRARY_PATH
-# CYCLES_CUDA_ADAPTIVE_COMPILE=1
 
 
 # Maya variables
